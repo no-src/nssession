@@ -1,0 +1,60 @@
+name: Go
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        go: [ '1.18','1.19' ]
+        os: [ 'ubuntu-latest' ]
+    runs-on: ${{ matrix.os }}
+
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+
+      etcd:
+        image: gcr.io/etcd-development/etcd:v3.5.4
+        options: >-
+          --health-cmd "etcdctl endpoint health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --env ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379
+          --env ETCD_ADVERTISE_CLIENT_URLS=http://0.0.0.0:2379
+        ports:
+          - 2379:2379
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v -race ./... -coverprofile=coverage.txt -covermode=atomic -timeout=10m
+
+      - name: Codecov
+        uses: codecov/codecov-action@v3
