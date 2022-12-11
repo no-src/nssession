@@ -1,1 +1,86 @@
 # nssession
+
+[![Build](https://img.shields.io/github/workflow/status/no-src/nssession/Go)](https://github.com/no-src/nssession/actions)
+[![License](https://img.shields.io/github/license/no-src/nssession)](https://github.com/no-src/nssession/blob/main/LICENSE)
+[![Go Reference](https://pkg.go.dev/badge/github.com/no-src/nssession.svg)](https://pkg.go.dev/github.com/no-src/nssession)
+[![Go Report Card](https://goreportcard.com/badge/github.com/no-src/nssession)](https://goreportcard.com/report/github.com/no-src/nssession)
+[![codecov](https://codecov.io/gh/no-src/nssession/branch/main/graph/badge.svg?token=4KMBA2D6TY)](https://codecov.io/gh/no-src/nssession)
+[![Release](https://img.shields.io/github/v/release/no-src/nssession)](https://github.com/no-src/nssession/releases)
+
+## Installation
+
+```bash
+go get -u github.com/no-src/nssession
+```
+
+## Quick Start
+
+```go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/no-src/log"
+	"github.com/no-src/nssession"
+	"github.com/no-src/nssession/store"
+	"github.com/no-src/nssession/store/memory"
+)
+
+func main() {
+	// initial default session config
+	c := &nssession.Config{
+		Connection:    "memory:",
+		Expiration:    time.Hour,
+		SessionKey:    nssession.DefaultSessionKey,
+		SessionPrefix: nssession.DefaultSessionPrefix,
+		Store:         store.NewStore(memory.Driver),
+	}
+	err := nssession.InitDefaultConfig(c)
+	if err != nil {
+		log.Error(err, "init the default config error")
+		return
+	}
+
+	// get session component
+	session, err := nssession.Default(context.Background())
+	if err != nil {
+		log.Error(err, "get session component error")
+		return
+	}
+
+	// set session data
+	k := "hello"
+	var v string
+	err = session.Set(k, "world")
+	if err != nil {
+		log.Error(err, "set session data error")
+		return
+	}
+
+	// get session data
+	err = session.Get(k, &v)
+	if err != nil {
+		log.Error(err, "get session data error")
+		return
+	}
+
+	log.Info("get the session data success, k=%s v=%s", k, v)
+
+	// remove session data
+	err = session.Remove(k)
+	if err != nil {
+		log.Error(err, "remove session data error")
+		return
+	}
+
+	// clear all session data for the current session
+	err = session.Clear()
+	if err != nil {
+		log.Error(err, "clear session data error")
+		return
+	}
+}
+
+```
