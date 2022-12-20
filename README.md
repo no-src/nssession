@@ -1,6 +1,6 @@
 # nssession
 
-[![Build](https://img.shields.io/github/workflow/status/no-src/nssession/Go)](https://github.com/no-src/nssession/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/no-src/nssession/go.yml?branch=main)](https://github.com/no-src/nssession/actions)
 [![License](https://img.shields.io/github/license/no-src/nssession)](https://github.com/no-src/nssession/blob/main/LICENSE)
 [![Go Reference](https://pkg.go.dev/badge/github.com/no-src/nssession.svg)](https://pkg.go.dev/github.com/no-src/nssession)
 [![Go Report Card](https://goreportcard.com/badge/github.com/no-src/nssession)](https://goreportcard.com/report/github.com/no-src/nssession)
