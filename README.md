@@ -19,7 +19,7 @@ go get -u github.com/no-src/nssession
 package main
 
 import (
-	"context"
+	"net/http"
 	"time"
 
 	"github.com/no-src/log"
@@ -33,7 +33,7 @@ func main() {
 	c := &nssession.Config{
 		Connection:    "memory:",
 		Expiration:    time.Hour,
-		SessionKey:    nssession.DefaultSessionKey,
+		CookieName:    nssession.DefaultCookieName,
 		SessionPrefix: nssession.DefaultSessionPrefix,
 		Store:         store.NewStore(memory.Driver),
 	}
@@ -43,44 +43,46 @@ func main() {
 		return
 	}
 
-	// get session component
-	session, err := nssession.Default(context.Background())
-	if err != nil {
-		log.Error(err, "get session component error")
-		return
-	}
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		// get session component
+		session, err := nssession.Default(request, writer)
+		if err != nil {
+			log.Error(err, "get session component error")
+			return
+		}
 
-	// set session data
-	k := "hello"
-	var v string
-	err = session.Set(k, "world")
-	if err != nil {
-		log.Error(err, "set session data error")
-		return
-	}
+		// set session data
+		k := "hello"
+		var v string
+		err = session.Set(k, "world")
+		if err != nil {
+			log.Error(err, "set session data error")
+			return
+		}
 
-	// get session data
-	err = session.Get(k, &v)
-	if err != nil {
-		log.Error(err, "get session data error")
-		return
-	}
+		// get session data
+		err = session.Get(k, &v)
+		if err != nil {
+			log.Error(err, "get session data error")
+			return
+		}
 
-	log.Info("get the session data success, k=%s v=%s", k, v)
+		log.Info("get the session data success, k=%s v=%s", k, v)
 
-	// remove session data
-	err = session.Remove(k)
-	if err != nil {
-		log.Error(err, "remove session data error")
-		return
-	}
+		// remove session data
+		err = session.Remove(k)
+		if err != nil {
+			log.Error(err, "remove session data error")
+			return
+		}
 
-	// clear all session data for the current session
-	err = session.Clear()
-	if err != nil {
-		log.Error(err, "clear session data error")
-		return
-	}
+		// clear all session data for the current session
+		err = session.Clear()
+		if err != nil {
+			log.Error(err, "clear session data error")
+			return
+		}
+	})
+	http.ListenAndServe(":8080", nil)
 }
-
 ```

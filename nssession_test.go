@@ -1,8 +1,9 @@
 package nssession
 
 import (
-	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -17,7 +18,7 @@ var (
 	memoryConfig = &Config{
 		Connection:    "memory:",
 		Expiration:    time.Hour,
-		SessionKey:    DefaultSessionKey,
+		CookieName:    DefaultCookieName,
 		SessionPrefix: DefaultSessionPrefix,
 		Store:         store.NewStore(memory.Driver),
 	}
@@ -25,7 +26,7 @@ var (
 	buntDBConfig = &Config{
 		Connection:    "buntdb://:memory:",
 		Expiration:    time.Hour,
-		SessionKey:    DefaultSessionKey,
+		CookieName:    DefaultCookieName,
 		SessionPrefix: DefaultSessionPrefix,
 		Store:         store.NewStore(buntdb.Driver),
 	}
@@ -33,7 +34,7 @@ var (
 	redisConfig = &Config{
 		Connection:    "redis://127.0.0.1:6379",
 		Expiration:    time.Hour,
-		SessionKey:    DefaultSessionKey,
+		CookieName:    DefaultCookieName,
 		SessionPrefix: DefaultSessionPrefix,
 		Store:         store.NewStore(redis.Driver),
 	}
@@ -41,7 +42,7 @@ var (
 	etcdConfig = &Config{
 		Connection:    "etcd://127.0.0.1:2379?dial_timeout=5s",
 		Expiration:    time.Hour,
-		SessionKey:    DefaultSessionKey,
+		CookieName:    DefaultCookieName,
 		SessionPrefix: DefaultSessionPrefix,
 		Store:         store.NewStore(etcd.Driver),
 	}
@@ -65,8 +66,7 @@ func TestNSSession_Etcd(t *testing.T) {
 
 func testNSSession(t *testing.T, c *Config) {
 	InitDefaultConfig(c)
-
-	session, err := Default(context.Background())
+	session, err := Default(createTestRequestAndWriter())
 	if err != nil {
 		t.Errorf("get session component error, err=%v", err)
 		return
@@ -139,7 +139,8 @@ func testNSSession(t *testing.T, c *Config) {
 }
 
 func TestNew_WithNilConfig(t *testing.T) {
-	_, err := New(context.Background(), nil)
+	req, writer := createTestRequestAndWriter()
+	_, err := New(nil, req, writer)
 	if !errors.Is(err, errNilConfig) {
 		t.Errorf("expect to get error %v, but get %v", errNilConfig, err)
 	}
@@ -149,11 +150,12 @@ func TestNew_WithUnsupportedStoreDriver(t *testing.T) {
 	c := &Config{
 		Connection:    "memory:",
 		Expiration:    time.Hour,
-		SessionKey:    DefaultSessionKey,
+		CookieName:    DefaultCookieName,
 		SessionPrefix: DefaultSessionPrefix,
 		Store:         store.NewStore(redis.Driver),
 	}
-	_, err := New(context.Background(), c)
+	req, writer := createTestRequestAndWriter()
+	_, err := New(c, req, writer)
 	if err == nil {
 		t.Errorf("expect to get an error, but get nil")
 	}
@@ -163,8 +165,12 @@ func TestNSSession_WithExistSessionID(t *testing.T) {
 	InitDefaultConfig(memoryConfig)
 
 	sessionID := "abcdefg"
-	ctx := context.WithValue(context.Background(), memoryConfig.SessionKey, sessionID)
-	session, err := Default(ctx)
+	req, writer := createTestRequestAndWriter()
+	req.AddCookie(&http.Cookie{
+		Name:  memoryConfig.CookieName,
+		Value: sessionID,
+	})
+	session, err := Default(req, writer)
 	if err != nil {
 		t.Errorf("get session component error, err=%v", err)
 		return
@@ -172,4 +178,10 @@ func TestNSSession_WithExistSessionID(t *testing.T) {
 	if session.ID() != sessionID {
 		t.Errorf("expect to get session id %s, but get %s", sessionID, session.ID())
 	}
+}
+
+func createTestRequestAndWriter() (req *http.Request, writer http.ResponseWriter) {
+	req = httptest.NewRequest(http.MethodGet, "/", nil)
+	writer = httptest.NewRecorder()
+	return req, writer
 }
