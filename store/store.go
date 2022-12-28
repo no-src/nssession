@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	"github.com/no-src/nscache"
 )
@@ -23,9 +24,17 @@ type DriverName string
 
 type store struct {
 	drivers []DriverName
+	caches  map[string]nscache.NSCache
+	mu      sync.RWMutex
 }
 
 func (s *store) NewCache(conn string) (nscache.NSCache, error) {
+	s.mu.RLock()
+	cache := s.caches[conn]
+	s.mu.RUnlock()
+	if cache != nil {
+		return cache, nil
+	}
 	args := strings.Split(conn, ":")
 	if len(args) < 2 {
 		return nil, errInvalidStoreDriver
@@ -39,12 +48,20 @@ func (s *store) NewCache(conn string) (nscache.NSCache, error) {
 	if !supported {
 		return nil, errUnsupportedStoreDriver
 	}
-	return nscache.NewCache(conn)
+	cache, err := nscache.NewCache(conn)
+	if err != nil {
+		return nil, err
+	}
+	s.mu.Lock()
+	s.caches[conn] = cache
+	s.mu.Unlock()
+	return cache, nil
 }
 
 // NewStore create an instance of the Store with the specified drivers
 func NewStore(drivers ...DriverName) Store {
 	return &store{
 		drivers: drivers,
+		caches:  make(map[string]nscache.NSCache),
 	}
 }

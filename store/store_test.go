@@ -24,8 +24,13 @@ func TestStore(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(string(tc.driver), func(t *testing.T) {
 			s := store.NewStore(tc.driver)
-			_, err := s.NewCache(tc.conn)
-			if err != nil {
+			conn := tc.conn
+			go func() {
+				if _, err := s.NewCache(conn); err != nil {
+					t.Errorf("get cache component error by concurrent, err=%v", err)
+				}
+			}()
+			if _, err := s.NewCache(conn); err != nil {
 				t.Errorf("get cache component error, err=%v", err)
 			}
 		})
@@ -39,6 +44,7 @@ func TestStore_ReturnError(t *testing.T) {
 	}{
 		{buntdb.Driver, "memory:"},
 		{memory.Driver, ""},
+		{etcd.Driver, "etcd://127.0.0.1:2379?dial_timeout=5z"},
 	}
 
 	for _, tc := range testCases {
