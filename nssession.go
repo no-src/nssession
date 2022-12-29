@@ -1,8 +1,8 @@
 package nssession
 
 import (
-	"context"
 	"errors"
+	"net/http"
 )
 
 // ErrNil get nil data
@@ -27,6 +27,6 @@ type NSSession interface {
 }
 
 // Default get the session with the global session config
-func Default(ctx context.Context) (NSSession, error) {
-	return New(ctx, defaultConfig)
+func Default(req *http.Request, writer http.ResponseWriter) (NSSession, error) {
+	return New(defaultConfig, req, writer)
 }

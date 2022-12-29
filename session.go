@@ -1,18 +1,20 @@
 package nssession
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/no-src/nscache"
 )
 
 type session struct {
-	c     *Config
-	cache nscache.NSCache
-	id    string
+	c      *Config
+	cache  nscache.NSCache
+	id     string
+	req    *http.Request
+	writer http.ResponseWriter
 }
 
 func (s *session) ID() string {
@@ -83,20 +85,37 @@ func (s *session) key() string {
 }
 
 // New get the session with the specified session config
-func New(ctx context.Context, c *Config) (NSSession, error) {
+func New(c *Config, req *http.Request, writer http.ResponseWriter) (NSSession, error) {
 	if c == nil {
 		return nil, errNilConfig
 	}
 	s := &session{
-		c: c,
+		c:      c,
+		req:    req,
+		writer: writer,
 	}
-	sessionID := ctx.Value(c.SessionKey)
-	if sessionID == nil {
-		s.id = s.generateID()
-	} else {
-		s.id = sessionID.(string)
-		ctx = context.WithValue(ctx, c.SessionKey, s.id)
+
+	var sessionID string
+	if s.req != nil {
+		cookie, err := s.req.Cookie(c.CookieName)
+		if err == nil && cookie != nil {
+			sessionID = cookie.Value
+		}
 	}
+
+	if len(sessionID) == 0 {
+		sessionID = s.generateID()
+		if s.writer != nil {
+			http.SetCookie(s.writer, &http.Cookie{
+				Name:     c.CookieName,
+				Value:    sessionID,
+				Path:     "/",
+				HttpOnly: true,
+			})
+		}
+	}
+
+	s.id = sessionID
 	var err error
 	s.cache, err = c.Store.NewCache(c.Connection)
 	if err != nil {
