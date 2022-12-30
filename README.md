@@ -31,11 +31,9 @@ import (
 func main() {
 	// initial default session config
 	c := &nssession.Config{
-		Connection:    "memory:",
-		Expiration:    time.Hour,
-		CookieName:    nssession.DefaultCookieName,
-		SessionPrefix: nssession.DefaultSessionPrefix,
-		Store:         store.NewStore(memory.Driver),
+		Connection: "memory:",
+		Expiration: time.Hour,
+		Store:      store.NewStore(memory.Driver),
 	}
 	err := nssession.InitDefaultConfig(c)
 	if err != nil {

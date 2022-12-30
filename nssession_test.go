@@ -16,35 +16,27 @@ import (
 
 var (
 	memoryConfig = &Config{
-		Connection:    "memory:",
-		Expiration:    time.Hour,
-		CookieName:    DefaultCookieName,
-		SessionPrefix: DefaultSessionPrefix,
-		Store:         store.NewStore(memory.Driver),
+		Connection: "memory:",
+		Expiration: time.Hour,
+		Store:      store.NewStore(memory.Driver),
 	}
 
 	buntDBConfig = &Config{
-		Connection:    "buntdb://:memory:",
-		Expiration:    time.Hour,
-		CookieName:    DefaultCookieName,
-		SessionPrefix: DefaultSessionPrefix,
-		Store:         store.NewStore(buntdb.Driver),
+		Connection: "buntdb://:memory:",
+		Expiration: time.Hour,
+		Store:      store.NewStore(buntdb.Driver),
 	}
 
 	redisConfig = &Config{
-		Connection:    "redis://127.0.0.1:6379",
-		Expiration:    time.Hour,
-		CookieName:    DefaultCookieName,
-		SessionPrefix: DefaultSessionPrefix,
-		Store:         store.NewStore(redis.Driver),
+		Connection: "redis://127.0.0.1:6379",
+		Expiration: time.Hour,
+		Store:      store.NewStore(redis.Driver),
 	}
 
 	etcdConfig = &Config{
-		Connection:    "etcd://127.0.0.1:2379?dial_timeout=5s",
-		Expiration:    time.Hour,
-		CookieName:    DefaultCookieName,
-		SessionPrefix: DefaultSessionPrefix,
-		Store:         store.NewStore(etcd.Driver),
+		Connection: "etcd://127.0.0.1:2379?dial_timeout=5s",
+		Expiration: time.Hour,
+		Store:      store.NewStore(etcd.Driver),
 	}
 )
 
@@ -148,11 +140,9 @@ func TestNew_WithNilConfig(t *testing.T) {
 
 func TestNew_WithUnsupportedStoreDriver(t *testing.T) {
 	c := &Config{
-		Connection:    "memory:",
-		Expiration:    time.Hour,
-		CookieName:    DefaultCookieName,
-		SessionPrefix: DefaultSessionPrefix,
-		Store:         store.NewStore(redis.Driver),
+		Connection: "memory:",
+		Expiration: time.Hour,
+		Store:      store.NewStore(redis.Driver),
 	}
 	req, writer := createTestRequestAndWriter()
 	_, err := New(c, req, writer)
@@ -167,7 +157,7 @@ func TestNSSession_WithExistSessionID(t *testing.T) {
 	sessionID := "abcdefg"
 	req, writer := createTestRequestAndWriter()
 	req.AddCookie(&http.Cookie{
-		Name:  memoryConfig.CookieName,
+		Name:  memoryConfig.Cookie.Name,
 		Value: sessionID,
 	})
 	session, err := Default(req, writer)

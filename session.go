@@ -97,7 +97,7 @@ func New(c *Config, req *http.Request, writer http.ResponseWriter) (NSSession, e
 
 	var sessionID string
 	if s.req != nil {
-		cookie, err := s.req.Cookie(c.CookieName)
+		cookie, err := s.req.Cookie(c.Cookie.Name)
 		if err == nil && cookie != nil {
 			sessionID = cookie.Value
 		}
@@ -107,10 +107,15 @@ func New(c *Config, req *http.Request, writer http.ResponseWriter) (NSSession, e
 		sessionID = s.generateID()
 		if s.writer != nil {
 			http.SetCookie(s.writer, &http.Cookie{
-				Name:     c.CookieName,
+				Name:     c.Cookie.Name,
 				Value:    sessionID,
-				Path:     "/",
+				Path:     c.Cookie.Path,
+				Domain:   c.Cookie.Domain,
+				Expires:  c.Cookie.Expires,
+				MaxAge:   c.Cookie.MaxAge,
+				Secure:   c.Cookie.Secure,
 				HttpOnly: true,
+				SameSite: c.Cookie.SameSite,
 			})
 		}
 	}
