@@ -28,9 +28,9 @@ type store struct {
 	mu      sync.RWMutex
 }
 
-func (s *store) NewCache(conn string) (nscache.NSCache, error) {
+func (s *store) NewCache(conn string) (cache nscache.NSCache, err error) {
 	s.mu.RLock()
-	cache := s.caches[conn]
+	cache = s.caches[conn]
 	s.mu.RUnlock()
 	if cache != nil {
 		return cache, nil
@@ -48,14 +48,16 @@ func (s *store) NewCache(conn string) (nscache.NSCache, error) {
 	if !supported {
 		return nil, errUnsupportedStoreDriver
 	}
-	cache, err := nscache.NewCache(conn)
-	if err != nil {
-		return nil, err
-	}
+
 	s.mu.Lock()
-	s.caches[conn] = cache
-	s.mu.Unlock()
-	return cache, nil
+	defer s.mu.Unlock()
+	cache = s.caches[conn]
+	if cache == nil {
+		if cache, err = nscache.NewCache(conn); err == nil {
+			s.caches[conn] = cache
+		}
+	}
+	return cache, err
 }
 
 // NewStore create an instance of the Store with the specified drivers

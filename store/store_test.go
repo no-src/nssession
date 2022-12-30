@@ -27,13 +27,15 @@ func TestStore(t *testing.T) {
 			s := store.NewStore(tc.driver)
 			conn := tc.conn
 			wg := sync.WaitGroup{}
-			wg.Add(1)
-			go func() {
-				if _, err := s.NewCache(conn); err != nil {
-					t.Errorf("get cache component error by concurrent, err=%v", err)
-				}
-				wg.Done()
-			}()
+			for i := 0; i < 5; i++ {
+				wg.Add(1)
+				go func() {
+					if _, err := s.NewCache(conn); err != nil {
+						t.Errorf("get cache component error by concurrent, err=%v", err)
+					}
+					wg.Done()
+				}()
+			}
 			if _, err := s.NewCache(conn); err != nil {
 				t.Errorf("get cache component error, err=%v", err)
 			}
