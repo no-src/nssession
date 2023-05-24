@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/no-src/nssession/store"
+	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/memory"
@@ -20,6 +21,7 @@ func TestStore(t *testing.T) {
 		{buntdb.Driver, "buntdb://:memory:"},
 		{redis.Driver, "redis://127.0.0.1:6379"},
 		{etcd.Driver, "etcd://127.0.0.1:2379?dial_timeout=5s"},
+		{boltdb.Driver, "boltdb://boltdb.db"},
 	}
 
 	for _, tc := range testCases {
