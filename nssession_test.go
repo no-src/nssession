@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/no-src/nssession/store"
+	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/memory"
@@ -38,6 +39,12 @@ var (
 		Expiration: time.Hour,
 		Store:      store.NewStore(etcd.Driver),
 	}
+
+	boltDBConfig = &Config{
+		Connection: "boltdb://boltdb.db",
+		Expiration: time.Hour,
+		Store:      store.NewStore(boltdb.Driver),
+	}
 )
 
 func TestNSSession_Memory(t *testing.T) {
@@ -54,6 +61,10 @@ func TestNSSession_Redis(t *testing.T) {
 
 func TestNSSession_Etcd(t *testing.T) {
 	testNSSession(t, etcdConfig)
+}
+
+func TestNSSession_BoltDB(t *testing.T) {
+	testNSSession(t, boltDBConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {
