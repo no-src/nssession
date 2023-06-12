@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/google/uuid v1.3.0
-	github.com/no-src/nscache v0.1.0
+	github.com/no-src/nscache v0.1.1
 )
 
 require (
@@ -15,7 +15,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/no-src/log v0.1.10 // indirect
-	github.com/redis/go-redis/v9 v9.0.4 // indirect
+	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/tidwall/btree v1.4.2 // indirect
 	github.com/tidwall/buntdb v1.3.0 // indirect
 	github.com/tidwall/gjson v1.14.3 // indirect
