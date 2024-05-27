@@ -10,6 +10,7 @@ import (
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
+	"github.com/no-src/nssession/store/redis_cluster"
 )
 
 func TestStore(t *testing.T) {
@@ -20,6 +21,7 @@ func TestStore(t *testing.T) {
 		{memory.Driver, "memory:"},
 		{buntdb.Driver, "buntdb://:memory:"},
 		{redis.Driver, "redis://127.0.0.1:6379"},
+		{redis_cluster.Driver, "redis-cluster://127.0.0.1:7001?addr=127.0.0.1:7002&addr=127.0.0.1:7003"},
 		{etcd.Driver, "etcd://127.0.0.1:2379?dial_timeout=5s"},
 		{boltdb.Driver, "boltdb://boltdb.db"},
 	}
