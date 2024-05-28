@@ -13,6 +13,7 @@ import (
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
+	"github.com/no-src/nssession/store/redis_cluster"
 )
 
 var (
@@ -32,6 +33,12 @@ var (
 		Connection: "redis://127.0.0.1:6379",
 		Expiration: time.Hour,
 		Store:      store.NewStore(redis.Driver),
+	}
+
+	redisClusterConfig = &Config{
+		Connection: "redis-cluster://127.0.0.1:7001?addr=127.0.0.1:7002&addr=127.0.0.1:7003",
+		Expiration: time.Hour,
+		Store:      store.NewStore(redis_cluster.Driver),
 	}
 
 	etcdConfig = &Config{
@@ -57,6 +64,10 @@ func TestNSSession_BuntDB(t *testing.T) {
 
 func TestNSSession_Redis(t *testing.T) {
 	testNSSession(t, redisConfig)
+}
+
+func TestNSSession_RedisCluster(t *testing.T) {
+	testNSSession(t, redisClusterConfig)
 }
 
 func TestNSSession_Etcd(t *testing.T) {
