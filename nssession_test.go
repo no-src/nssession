@@ -11,6 +11,7 @@ import (
 	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
+	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
 	"github.com/no-src/nssession/store/redis_cluster"
@@ -52,6 +53,12 @@ var (
 		Expiration: time.Hour,
 		Store:      store.NewStore(boltdb.Driver),
 	}
+
+	memcachedConfig = &Config{
+		Connection: "memcached://127.0.0.1:11211",
+		Expiration: time.Hour,
+		Store:      store.NewStore(memcached.Driver),
+	}
 )
 
 func TestNSSession_Memory(t *testing.T) {
@@ -76,6 +83,10 @@ func TestNSSession_Etcd(t *testing.T) {
 
 func TestNSSession_BoltDB(t *testing.T) {
 	testNSSession(t, boltDBConfig)
+}
+
+func TestNSSession_Memcached(t *testing.T) {
+	testNSSession(t, memcachedConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {

@@ -8,6 +8,7 @@ import (
 	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
+	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
 	"github.com/no-src/nssession/store/redis_cluster"
@@ -24,6 +25,7 @@ func TestStore(t *testing.T) {
 		{redis_cluster.Driver, "redis-cluster://127.0.0.1:7001?addr=127.0.0.1:7002&addr=127.0.0.1:7003"},
 		{etcd.Driver, "etcd://127.0.0.1:2379?dial_timeout=5s"},
 		{boltdb.Driver, "boltdb://boltdb.db"},
+		{memcached.Driver, "memcached://127.0.0.1:11211"},
 	}
 
 	for _, tc := range testCases {
