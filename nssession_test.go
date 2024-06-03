@@ -11,6 +11,7 @@ import (
 	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
+	"github.com/no-src/nssession/store/fastcache"
 	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
@@ -59,6 +60,12 @@ var (
 		Expiration: time.Hour,
 		Store:      store.NewStore(memcached.Driver),
 	}
+
+	fastcacheConfig = &Config{
+		Connection: "fastcache://?max_bytes=50mib",
+		Expiration: time.Hour,
+		Store:      store.NewStore(fastcache.Driver),
+	}
 )
 
 func TestNSSession_Memory(t *testing.T) {
@@ -87,6 +94,10 @@ func TestNSSession_BoltDB(t *testing.T) {
 
 func TestNSSession_Memcached(t *testing.T) {
 	testNSSession(t, memcachedConfig)
+}
+
+func TestNSSession_Fastcache(t *testing.T) {
+	testNSSession(t, fastcacheConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {
