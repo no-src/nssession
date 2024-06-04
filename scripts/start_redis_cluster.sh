@@ -10,3 +10,5 @@ sleep 3s
 # create cluster
 HOST_IP=$(hostname -I | cut -d' ' -f1)
 docker run --rm redis:latest redis-cli --cluster-yes --cluster create $HOST_IP:7001 $HOST_IP:7002 $HOST_IP:7003
+
+sleep 3s
