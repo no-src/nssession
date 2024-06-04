@@ -12,6 +12,7 @@ import (
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/fastcache"
+	"github.com/no-src/nssession/store/freecache"
 	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
@@ -66,6 +67,12 @@ var (
 		Expiration: time.Hour,
 		Store:      store.NewStore(fastcache.Driver),
 	}
+
+	freecacheConfig = &Config{
+		Connection: "freecache://?cache_size=50mib",
+		Expiration: time.Hour,
+		Store:      store.NewStore(freecache.Driver),
+	}
 )
 
 func TestNSSession_Memory(t *testing.T) {
@@ -98,6 +105,10 @@ func TestNSSession_Memcached(t *testing.T) {
 
 func TestNSSession_Fastcache(t *testing.T) {
 	testNSSession(t, fastcacheConfig)
+}
+
+func TestNSSession_Freecache(t *testing.T) {
+	testNSSession(t, freecacheConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {
