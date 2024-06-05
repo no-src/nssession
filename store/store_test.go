@@ -9,6 +9,7 @@ import (
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
 	"github.com/no-src/nssession/store/fastcache"
+	"github.com/no-src/nssession/store/freecache"
 	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
 	"github.com/no-src/nssession/store/redis"
@@ -28,6 +29,7 @@ func TestStore(t *testing.T) {
 		{boltdb.Driver, "boltdb://boltdb.db"},
 		{memcached.Driver, "memcached://127.0.0.1:11211"},
 		{fastcache.Driver, "fastcache://?max_bytes=50mib"},
+		{freecache.Driver, "freecache://?cache_size=50mib"},
 	}
 
 	for _, tc := range testCases {
