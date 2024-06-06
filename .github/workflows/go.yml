@@ -58,8 +58,11 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+      - name: Install nscache-server
+        run: go install github.com/no-src/nscache/cmd/nscache-server@main
+
       - name: Start nscache-server
-        run: go install github.com/no-src/nscache/cmd/nscache-server@main && nscache-server
+        run: nscache-server &
 
       - name: Start Redis Cluster
         run: chmod +x ./scripts/start_redis_cluster.sh && ./scripts/start_redis_cluster.sh
