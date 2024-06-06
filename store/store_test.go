@@ -12,6 +12,7 @@ import (
 	"github.com/no-src/nssession/store/freecache"
 	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
+	"github.com/no-src/nssession/store/proxy"
 	"github.com/no-src/nssession/store/redis"
 	"github.com/no-src/nssession/store/redis_cluster"
 )
@@ -30,6 +31,7 @@ func TestStore(t *testing.T) {
 		{memcached.Driver, "memcached://127.0.0.1:11211"},
 		{fastcache.Driver, "fastcache://?max_bytes=50mib"},
 		{freecache.Driver, "freecache://?cache_size=50mib"},
+		{proxy.Driver, "proxy://127.0.0.1:8080"},
 	}
 
 	for _, tc := range testCases {
