@@ -15,6 +15,7 @@ import (
 	"github.com/no-src/nssession/store/freecache"
 	"github.com/no-src/nssession/store/memcached"
 	"github.com/no-src/nssession/store/memory"
+	"github.com/no-src/nssession/store/proxy"
 	"github.com/no-src/nssession/store/redis"
 	"github.com/no-src/nssession/store/redis_cluster"
 )
@@ -73,6 +74,12 @@ var (
 		Expiration: time.Hour,
 		Store:      store.NewStore(freecache.Driver),
 	}
+
+	proxyConfig = &Config{
+		Connection: "proxy://127.0.0.1:8080",
+		Expiration: time.Hour,
+		Store:      store.NewStore(proxy.Driver),
+	}
 )
 
 func TestNSSession_Memory(t *testing.T) {
@@ -109,6 +116,10 @@ func TestNSSession_Fastcache(t *testing.T) {
 
 func TestNSSession_Freecache(t *testing.T) {
 	testNSSession(t, freecacheConfig)
+}
+
+func TestNSSession_Proxy(t *testing.T) {
+	testNSSession(t, proxyConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {
