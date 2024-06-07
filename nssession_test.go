@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/no-src/nssession/store"
+	"github.com/no-src/nssession/store/bigcache"
 	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
@@ -63,13 +64,13 @@ var (
 		Store:      store.NewStore(memcached.Driver),
 	}
 
-	fastcacheConfig = &Config{
+	fastCacheConfig = &Config{
 		Connection: "fastcache://?max_bytes=50mib",
 		Expiration: time.Hour,
 		Store:      store.NewStore(fastcache.Driver),
 	}
 
-	freecacheConfig = &Config{
+	freeCacheConfig = &Config{
 		Connection: "freecache://?cache_size=50mib",
 		Expiration: time.Hour,
 		Store:      store.NewStore(freecache.Driver),
@@ -79,6 +80,12 @@ var (
 		Connection: "proxy://127.0.0.1:8080",
 		Expiration: time.Hour,
 		Store:      store.NewStore(proxy.Driver),
+	}
+
+	bigCacheConfig = &Config{
+		Connection: "bigcache://?eviction=10m",
+		Expiration: time.Hour,
+		Store:      store.NewStore(bigcache.Driver),
 	}
 )
 
@@ -110,16 +117,20 @@ func TestNSSession_Memcached(t *testing.T) {
 	testNSSession(t, memcachedConfig)
 }
 
-func TestNSSession_Fastcache(t *testing.T) {
-	testNSSession(t, fastcacheConfig)
+func TestNSSession_FastCache(t *testing.T) {
+	testNSSession(t, fastCacheConfig)
 }
 
-func TestNSSession_Freecache(t *testing.T) {
-	testNSSession(t, freecacheConfig)
+func TestNSSession_FreeCache(t *testing.T) {
+	testNSSession(t, freeCacheConfig)
 }
 
 func TestNSSession_Proxy(t *testing.T) {
 	testNSSession(t, proxyConfig)
+}
+
+func TestNSSession_BigCache(t *testing.T) {
+	testNSSession(t, bigCacheConfig)
 }
 
 func testNSSession(t *testing.T, c *Config) {
