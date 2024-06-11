@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/VictoriaMetrics/fastcache v1.12.2 // indirect
+	github.com/allegro/bigcache/v3 v3.1.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/coocood/freecache v1.2.4 // indirect

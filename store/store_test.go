@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/no-src/nssession/store"
+	"github.com/no-src/nssession/store/bigcache"
 	"github.com/no-src/nssession/store/boltdb"
 	"github.com/no-src/nssession/store/buntdb"
 	"github.com/no-src/nssession/store/etcd"
@@ -32,6 +33,7 @@ func TestStore(t *testing.T) {
 		{fastcache.Driver, "fastcache://?max_bytes=50mib"},
 		{freecache.Driver, "freecache://?cache_size=50mib"},
 		{proxy.Driver, "proxy://127.0.0.1:8080"},
+		{bigcache.Driver, "bigcache://?eviction=10m"},
 	}
 
 	for _, tc := range testCases {
